@@ -1,0 +1,31 @@
+\documentclass{article}
+
+\usepackage{amsfonts}
+
+
+\begin{document}
+
+\title{Determing Current Position of a Mecanum Robot From Wheel Speeds Over Time}
+\author{Adam Dunlap}
+\date{\today}
+\maketitle
+
+\section{Definitions}
+\begin{itemize}
+\item Let $v$ be a function that takes $\mathbb{R}$ --- a time --- and returns $\mathbb{R}^4$ --- the velocity of each wheel obtained by sensor data.
+
+\item Let $r$ be a function that takes $\mathbb{R}^4 * \mathbb{R}$ --- the velocity of each wheel and the abosolute angle of the robot --- and returns $\mathbb{R}^2 * \mathbb{R}$ --- the velocity of the robot and the rotational velocity of the robot.
+
+\item Let $n$ be a function that takes $\mathbb{R}^4$ --- the velocity of each wheel --- and returns $\mathbb{R}$ --- the rotational velocity of the robot.
+
+\item Let $k$ be a function that takes $\mathbb{R}$ --- a time --- and returns $\mathbb{R}^2 * \mathbb{R}$ --- the velocity of the robot and the rotational velocity of the robot
+
+\end{itemize}
+
+\section{Forward Kinematics}
+The goal of forward kinematics is to find $k$ --- where the robot is given a time. This can be found with
+\[
+k(t) = \left(r\left(v\left(t\right), \int_0^t n\left(x\right) dx\right), n\left(t\right)\right)
+\]
+
+\end{document}
