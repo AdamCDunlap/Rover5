@@ -8,8 +8,16 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <ncurses.h>
 using namespace std;
+
+//#define USE_CURSES
+
+#ifdef USE_CURSES
+#include <curses.h>
+bool usecurses = isatty(1); // stdout
+#else
+bool usecurses = false;
+#endif //USE_CURSES
 
 // stty the port
 // read from the port
@@ -17,12 +25,79 @@ using namespace std;
 // display data
 // ?do math
 
+bool checkForValue(int fd, char w);
+int openPort(const char* ardpath);
+
 namespace Rover5 {
     enum mtrNum_t { BR = 0, FR = 1, BL = 2, FL = 3 };
 }
+// {{{ WinClass
+#ifdef USE_CURSES
+class Win {
+public:
+    Win() {
+        if (usecurses) {
+            initscr();
+            curs_set(0);
 
-bool checkForValue(int fd, char w);
+            int maxy, maxx;
+            getmaxyx(stdscr, maxy, maxx);
 
+            winds[Win::stmicros] = newwin(4, 15, 0, 0);
+            mvwaddstr(winds[Win::stmicros], 1, 1, "Start Micros:");
+
+            winds[Win::endmicros] = newwin(4, 15, 4, 0);
+            mvwaddstr(winds[Win::endmicros], 1, 1, "End Micros:");
+
+            winds[Win::encdsts] = newwin(7, 15, 0, 40);
+            mvwaddstr(winds[Win::encdsts], 1, 1, "Enc Dists:");
+            mvwaddstr(winds[Win::encdsts], 2, 1, "FR");
+            mvwaddstr(winds[Win::encdsts], 3, 1, "FL");
+            mvwaddstr(winds[Win::encdsts], 4, 1, "BR");
+            mvwaddstr(winds[Win::encdsts], 5, 1, "BL");
+
+            winds[Win::pows] = newwin(7, 15, 0, 60);
+            mvwaddstr(winds[Win::pows], 1, 1, "Motor Powers:");
+            mvwaddstr(winds[Win::pows], 2, 1, "FR");
+            mvwaddstr(winds[Win::pows], 3, 1, "FL");
+            mvwaddstr(winds[Win::pows], 4, 1, "BR");
+            mvwaddstr(winds[Win::pows], 5, 1, "BL");
+
+            winds[Win::pos] = newwin(7, 15, 10, 0);
+            mvwaddstr(winds[Win::pos], 1, 1, "Reported Pos:");
+            mvwaddstr(winds[Win::pos], 2, 1, "  X");
+            mvwaddstr(winds[Win::pos], 3, 1, "  Y");
+            mvwaddstr(winds[Win::pos], 4, 1, "ang");
+
+            winds[Win::errs] = newwin(4, 10, maxy-4, maxx-10);
+            mvwaddstr(winds[Win::errs], 1, 1, "Errors:");
+
+            for (size_t i=0; i<n; i++) {
+                box(winds[i], 0, 0);
+                wrefresh(winds[i]);
+            }
+        }
+    }
+
+    ~Win() {
+        if (usecurses) {
+            for (size_t i=0; i<n; i++) {
+                delwin(winds[i]);
+            }
+            endwin();
+        }
+    }
+
+    enum names {stmicros, endmicros, encdsts, pows, pos, errs, n};
+    WINDOW* operator[](size_t i) { return winds[i]; }
+private:
+    WINDOW* winds[n];
+} win;
+#endif // USE_CURSES
+// }}}
+
+
+//{{{ From Rover5.h
 //#define TWO_PI 6.283185307179586476925286766559
 ///************************ TAKEN FROM ROVER5.H**************************/
 //
@@ -74,6 +149,7 @@ bool checkForValue(int fd, char w);
 //TickLogs<spdLogLen> tickLogs;
 //
 ///************************ END TAKEN FROM ROVER5.H**************************/
+//}}}
 
 int main(int argc, char* argv[]) {
 
@@ -82,36 +158,7 @@ int main(int argc, char* argv[]) {
     if (argc >= 2) ardpath = argv[1];
     else ardpath = "/dev/ttyACM0";
 
-    int ardfd = open(ardpath, O_RDONLY);
-    if (ardfd == -1) {
-        cout << "open on `" << ardpath << "' failed." << endl;
-        return 2;
-    }
-
-    char sttycmd[256] = "stty -F ";
-    strcat(sttycmd, ardpath);
-    strcat(sttycmd, " cs8 115200 ignbrk -brkint -icrnl -imaxbel -opost -onlcr -isig -icanon -iexten -echo -echoe -echok -echoctl -echoke noflsh -ixon -crtscts");
-    //cout << "Running system(" << sttycmd << ")" << endl;
-    if (system(sttycmd)) {
-        cout << "system(" << sttycmd << ") failed" << endl;
-        return 2;
-    }
-
-    //char fardpath[128] = "-F";
-    //strcat(fardpath, ardpath);
-
-    //switch(fork()) {
-    //case 0: // child
-    //    execl("/usr/bin/stty", "stty", "-F", ardpath, "cs8", "115200", "ignbrk", "-brkint", "-icrnl", "-imaxbel", "-opost", "-onlcr", "-isig", "-icanon", "-iexten", "-echo", "-echoe", "-echok", "-echoctl", "-echoke", "noflsh", "-ixon", "-crtscts");
-    //    break;
-    //case -1: // error
-    //    cout << "fork error: " << strerror << " (" <<  errno << ")" << endl;
-    //    return 1;
-    //default:
-    //    break;
-    //}
-
-    ofstream outfile("outfile");
+    int ardfd = openPort(ardpath);
 
     while (true) {
 
@@ -124,10 +171,8 @@ int main(int argc, char* argv[]) {
         int32_t  xpos = 1234567890, ypos = 1234567890;
         uint16_t ang = 12345;
 
-        //read(ardfd, &c, 1);
-        //outfile << hex << (unsigned)c << endl;
-        //outfile << c << endl;
 
+        // {{{ Read Serial Port
         startreading:
         if (checkForValue(ardfd, '0')) goto startreading;
         read(ardfd, &stmicros, 4);
@@ -159,8 +204,10 @@ int main(int argc, char* argv[]) {
 
         read(ardfd, &endmicros, 4);
         if (checkForValue(ardfd, 'D')) goto startreading;
+        // }}}
 
 
+// {{{ From Rover5.cpp
 ///************************ TAKEN FROM ROVER5.CPP**************************/
 //
 //    // Variables used for integrating/dervitizing
@@ -221,42 +268,101 @@ int main(int argc, char* argv[]) {
 //
 //
 ///************************ TAKEN FROM ROVER5.CPP**************************/
+// }}}
 
 
-        mvprintw("%10lu %4ld %4ld %4ld %4ld % 4d % 4d % 4d % 4d %4ld %4ld %5u %10lu\r",
-            stmicros,
-            encdsts[Rover5::FL],
-            encdsts[Rover5::FR],
-            encdsts[Rover5::BL],
-            encdsts[Rover5::BR],
-            pows[Rover5::FL],
-            pows[Rover5::FR],
-            pows[Rover5::BL],
-            pows[Rover5::BR],
-            xpos,
-            ypos,
-            ang,
-            endmicros
-        );
+        #ifdef USE_CURSES
+        if (usecurses) {
+            mvwprintw(win[Win::stmicros], 2, 1, "%10u", stmicros);
+            wrefresh(win[Win::stmicros]);
+
+            mvwprintw(win[Win::endmicros], 2, 1, "%10u", endmicros);
+            wrefresh(win[Win::endmicros]);
+
+            mvwprintw(win[Win::encdsts], 2, 4, "% 5d", encdsts[Rover5::FL]);
+            mvwprintw(win[Win::encdsts], 3, 4, "% 5d", encdsts[Rover5::FR]);
+            mvwprintw(win[Win::encdsts], 4, 4, "% 5d", encdsts[Rover5::BL]);
+            mvwprintw(win[Win::encdsts], 5, 4, "% 5d", encdsts[Rover5::BR]);
+            wrefresh(win[Win::encdsts]);
+
+            mvwprintw(win[Win::pows], 2, 4, "% 4d", pows[Rover5::FL]);
+            mvwprintw(win[Win::pows], 3, 4, "% 4d", pows[Rover5::FR]);
+            mvwprintw(win[Win::pows], 4, 4, "% 4d", pows[Rover5::BL]);
+            mvwprintw(win[Win::pows], 5, 4, "% 4d", pows[Rover5::BR]);
+            wrefresh(win[Win::pows]);
+
+            mvwprintw(win[Win::pos], 2, 5, "% 5d", xpos);
+            mvwprintw(win[Win::pos], 3, 5, "% 5d", ypos);
+            mvwprintw(win[Win::pos], 4, 5, "% 5u", ang);
+            wrefresh(win[Win::pos]);
+            //enum names {stmicros, endmicros, encdsts, pows, pos, errs, n};
+        }
+        else
+        #endif //USE_CURSES
+        {
+            printf(
+                "%10u %4d %4d %4d %4d % 4d % 4d % 4d % 4d %4d %4d %5u %10u\n",
+                stmicros,
+                encdsts[Rover5::FL],
+                encdsts[Rover5::FR],
+                encdsts[Rover5::BL],
+                encdsts[Rover5::BR],
+                pows[Rover5::FL],
+                pows[Rover5::FR],
+                pows[Rover5::BL],
+                pows[Rover5::BR],
+                xpos,
+                ypos,
+                ang,
+                endmicros
+            );
+        }
     }
 
     return 0;
 }
 
 bool checkForValue(int fd, const char w) {
-    static int numerrs = 0;
+    static unsigned int numerrs = 0;
     char c = 123;
     read(fd, &c, 1);
     if (c != w) {
-        //cerr << "Received wrong value. Expecting "
-        //    << (int)w << " (" << (char)w << ")"
-        //    << " but received "
-        //    << (int)c << /*" (" << (char)c << ")" <<*/ endl;
-        if (++numerrs >= 100) {
-            cout << "There have been a LOT of wrong values. Exiting" << endl;
-            exit(3);
+        numerrs++;
+        if (!usecurses) {
+            cerr << "Exp: "
+                << (int)w << " (" << (char)w << ")"
+                << " act: "
+                << (int)c << ". " << numerrs << " errs" <<  endl;
+            //if (++numerrs >= 100) {
+            //    cout << "There have been a LOT of wrong values. Exiting" << endl;
+            //    exit(3);
+            //}
         }
         return true;
     }
+    #ifdef USE_CURSES
+    if (usecurses) {
+        mvwprintw(win[Win::errs], 2, 1, "%8u", numerrs);
+        wrefresh(win[Win::errs]);
+    }
+    #endif // USE_CURSES
     return false; // no error
+}
+
+int openPort(const char* ardpath) {
+    int ardfd = open(ardpath, O_RDONLY);
+    if (ardfd == -1) {
+        cout << "open on `" << ardpath << "' failed." << endl;
+        exit(2);
+    }
+
+    char sttycmd[256] = "stty -F ";
+    strcat(sttycmd, ardpath);
+    strcat(sttycmd, " cs8 115200 ignbrk -brkint -icrnl -imaxbel -opost -onlcr -isig -icanon -iexten -echo -echoe -echok -echoctl -echoke noflsh -ixon -crtscts");
+    //cout << "Running system(" << sttycmd << ")" << endl;
+    if (system(sttycmd)) {
+        cerr << "system(" << sttycmd << ") failed" << endl;
+        exit(2);
+    }
+    return ardfd;
 }
