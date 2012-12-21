@@ -1,3 +1,4 @@
 viewer
 .*.swp
 doc/
+*.o

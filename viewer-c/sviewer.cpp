@@ -15,7 +15,8 @@ using namespace std;
 #define USE_CURSES
 
 #ifdef USE_CURSES
-#include "Win.h"
+//#include "Win.h"
+#include "PrintBox.h"
 bool usecurses = isatty(1); // 1 is stdout
 #else
 bool usecurses = false;
@@ -31,7 +32,7 @@ bool checkForValue(int fd, char w);
 int openPort(const char* ardpath);
 
 Rover5 virtualBot;
-Win win;
+//Win win;
 
 //{{{ From Rover5.h
 //#define TWO_PI 6.283185307179586476925286766559
@@ -209,29 +210,47 @@ int main(int argc, char* argv[]) {
 
         #ifdef USE_CURSES
         if (usecurses) {
-            mvwprintw(win[Win::stmicros], 2, 1, "%10u", stmicros);
-            wrefresh(win[Win::stmicros]);
+            static PrintBox* stmicrosBox = PrintBox::NewBox(1, 13, "Start Micros:");
+            stmicrosBox->printf("%10u", stmicros);
 
-            mvwprintw(win[Win::endmicros], 2, 1, "%10u", endmicros);
-            wrefresh(win[Win::endmicros]);
+            static PrintBox* endmicrosBox = PrintBox::NewBox(1, 13, "End Micros:");
+            endmicrosBox->printf("%10u", endmicros);
 
-            mvwprintw(win[Win::encdsts], 2, 4, "% 5d", encdsts[Rover5::FL]);
-            mvwprintw(win[Win::encdsts], 2, 9, "% 5d", encdsts[Rover5::FR]);
-            mvwprintw(win[Win::encdsts], 3, 4, "% 5d", encdsts[Rover5::BL]);
-            mvwprintw(win[Win::encdsts], 3, 9, "% 5d", encdsts[Rover5::BR]);
-            wrefresh(win[Win::encdsts]);
+            static PrintBox* encdstsBox = PrintBox::NewBox(2, 16, "Enc Dists:");
+            encdstsBox->mvprintw(0,  0, "FL");
+            encdstsBox->mvprintw(0,  2, "% 5d", encdsts[Rover5::FL]);
+            encdstsBox->mvprintw(0, 14, "FR");
+            encdstsBox->mvprintw(0,  8, "% 5d", encdsts[Rover5::FR]);
+            encdstsBox->mvprintw(1,  0, "BL");
+            encdstsBox->mvprintw(1,  2, "% 5d", encdsts[Rover5::BL]);
+            encdstsBox->mvprintw(1, 14, "BR");
+            encdstsBox->mvprintw(1,  8, "% 5d", encdsts[Rover5::BR]);
 
-            mvwprintw(win[Win::pows], 2, 4, "% 4d", pows[Rover5::FL]);
-            mvwprintw(win[Win::pows], 2, 9, "% 4d", pows[Rover5::FR]);
-            mvwprintw(win[Win::pows], 3, 4, "% 4d", pows[Rover5::BL]);
-            mvwprintw(win[Win::pows], 3, 9, "% 4d", pows[Rover5::BR]);
-            wrefresh(win[Win::pows]);
+            static PrintBox* powsBox = PrintBox::NewBox(2, 15, "Motor Powers:");
+            powsBox->mvprintw(0,  0, "FL");
+            powsBox->mvprintw(0,  2, "% 4d", pows[Rover5::FL]);
+            powsBox->mvprintw(0, 13, "FR");
+            powsBox->mvprintw(0,  8, "% 4d", pows[Rover5::FR]);
+            powsBox->mvprintw(1,  0, "BL");
+            powsBox->mvprintw(1,  2, "% 4d", pows[Rover5::BL]);
+            powsBox->mvprintw(1, 13, "BR");
+            powsBox->mvprintw(1,  8, "% 4d", pows[Rover5::BR]);
 
-            mvwprintw(win[Win::pos], 2, 5, "% 5d", xpos);
-            mvwprintw(win[Win::pos], 3, 5, "% 5d", ypos);
-            mvwprintw(win[Win::pos], 4, 5, "% 5u", ang);
-            wrefresh(win[Win::pos]);
-            //enum names {stmicros, endmicros, encdsts, pows, pos, errs, n};
+            static PrintBox* posBox = PrintBox::NewBox(3, 13, "Reported Pos:");
+            posBox->mvprintw(0,  2,   "x:");
+            posBox->mvprintw(0,  4, "% 5d", xpos);
+            posBox->mvprintw(1,  2,   "y:");
+            posBox->mvprintw(1,  4, "% 5d", ypos);
+            posBox->mvprintw(2,  0, "ang:");
+            posBox->mvprintw(2,  4, "% 5u", ang);
+
+            static PrintBox* dummy0 = PrintBox::NewBox(3, 13, "sup");
+            static PrintBox* dummy1 = PrintBox::NewBox(3, 13, "sup");
+            static PrintBox* dummy2 = PrintBox::NewBox(3, 13, "sup");
+            static PrintBox* dummy3 = PrintBox::NewBox(3, 13, "sup");
+            static PrintBox* dummy4 = PrintBox::NewBox(3, 13, "sup");
+
+            PrintBox::refreshAll();
         }
         else
         #endif //USE_CURSES
@@ -278,8 +297,8 @@ bool checkForValue(int fd, const char w) {
     }
     #ifdef USE_CURSES
     if (usecurses) {
-        mvwprintw(win[Win::errs], 2, 1, "%8u", numerrs);
-        wrefresh(win[Win::errs]);
+        static PrintBox* errsBox = PrintBox::NewBox(1, 5, "errs:");
+        errsBox->printf("%5u", numerrs);
     }
     #endif // USE_CURSES
     return false; // no error
