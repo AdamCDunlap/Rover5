@@ -3,15 +3,18 @@
 
 #include <vector>
 #include <curses.h>
+#include <cstring>
 
 class PrintBox {
 public:
-// "Constructor"
-    static PrintBox* NewBox(int width, int height, const char* label);
+    PrintBox(int height, int width, const char* label);
+    PrintBox(int height, const char* label) : PrintBox(height, strlen(label), label) {}
+    PrintBox(const char* label) : PrintBox(1, label) {}
+    ~PrintBox();
 
     static void refreshAll();
 
-    int refresh() { return wrefresh(win); }
+    int refresh();
     int box(chtype verch, chtype horch) { return ::box(win, verch, horch); }
     int mvprintw(int y, int x, const char* fmt, ...) {
         va_list ap;
@@ -30,9 +33,7 @@ public:
         va_end(ap);
         return ret;
     }
-    int move(int y, int x) {
-        return wmove(win, y, x);
-    }
+    int move(int y, int x) { return wmove(win, y, x); }
     int printf(const char* fmt, ...) {
         va_list ap;
         int ret;
@@ -46,17 +47,14 @@ public:
 
     WINDOW* getWin() { return win; }
 private:
-    // Private constructor and destructor
-    PrintBox(int height, int width, int ypos, int xpos, const char* label);
-    ~PrintBox();
-
     WINDOW* win;
+    const char* label;
 
     static std::vector<PrintBox*> boxes;
     static int nextxpos;
     static int nextypos;
     static int maxHeight;
-    static bool firstRun;
+    static int numClasses;
 };
 
 #endif//PRINTSCREEN_H

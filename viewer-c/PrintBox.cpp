@@ -1,20 +1,24 @@
 #include "PrintBox.h"
 using namespace std;
 
-// "Constructor"
-PrintBox* PrintBox::NewBox(int height, int width, const char* label) {
-    if (firstRun) {
+PrintBox::PrintBox(int height, int width, const char* label) {
+    if (numClasses == 0) {
         initscr();
         curs_set(0);
-        firstRun = false;
+        noecho();
+        nodelay(stdscr, true);
+        //keypad(stdscr, true);
     }
 
-    PrintBox* tmp = new PrintBox(height, width, nextypos, nextxpos, label);
+    win = newwin(height+3, width+2, nextypos, nextxpos);
+    this->label = label;
+    refresh();
+    boxes.push_back(this);
+
     // For border
     width += 2;
     height += 3;
 
-    boxes.push_back(tmp);
 
     if (height > maxHeight) maxHeight = height;
     nextxpos += width;
@@ -23,8 +27,22 @@ PrintBox* PrintBox::NewBox(int height, int width, const char* label) {
         nextypos += maxHeight;
         maxHeight = 0;
     }
+    numClasses++;
+}
 
-    return tmp;
+PrintBox::~PrintBox() {
+    delwin(win);
+    numClasses--;
+    if (numClasses == 0) {
+        endwin();
+    }
+}
+
+int PrintBox::refresh() {
+    // First redraw the box and text
+    box(0, 0);
+    mvprintw(-1, 0, label);
+    return wrefresh(win);
 }
 
 void PrintBox::refreshAll() {
@@ -33,14 +51,8 @@ void PrintBox::refreshAll() {
     }
 }
 
-PrintBox::PrintBox(int height, int width, int ypos, int xpos, const char* label) {
-    win = newwin(height+3, width+2, ypos, xpos);
-    ::box(win, 0, 0);
-    mvprintw(-1, 0, label);
-}
-
 vector<PrintBox*> PrintBox::boxes;
 int PrintBox::nextxpos = 0;
 int PrintBox::nextypos = 0;
 int PrintBox::maxHeight = 3;
-bool PrintBox::firstRun = true;
+int PrintBox::numClasses = 0;
