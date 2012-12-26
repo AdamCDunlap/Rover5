@@ -10,6 +10,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include "Utility.h"
+
 using namespace std;
 
 /**
@@ -102,7 +104,7 @@ public:
     * method.
     * @param speeds The array to put the speeds into.
     */
-    void GetSpeeds(int16_t speeds[4]);
+    void GetSpeeds(double speeds[4]);
     
    /**
     * @brief Gets the current speeds for each motor.
@@ -113,7 +115,7 @@ public:
     * method.
     * @param speeds The array to put the speeds into.
     */
-    void GetTickSpeeds(int16_t speeds[4]);
+    void GetTickSpeeds(double speeds[4]);
 
    /**
     * @brief Get new encoder values and update current position and speed
@@ -132,7 +134,7 @@ public:
     * method.
     * @param dists The array to put the distances into.
     */
-    void GetDists(int32_t dists[4]);
+    void GetDists(double dists[4]);
 
    /**
     * @brief Gets the current distance the robot has gone.
@@ -144,7 +146,7 @@ public:
     *
     * @return The forward distance the robot has gone in mills
     */
-    int32_t GetDist();
+    double GetDist();
    /**
     * @brief Gets the current distance the robot has gone.
     *
@@ -157,7 +159,7 @@ public:
     * @param ydist The variable to store the forward distance the robot has
     *              gone in mills.
     */
-    void GetDist(int32_t* xdist, int32_t* ydist);
+    void GetDist(double* xdist, double* ydist);
 
 
    /**
@@ -168,7 +170,7 @@ public:
     * @param xpos The variable to store the x position of the robot in mills.
     * @param xpos The variable to store the x position of the robot in mills.
     */
-    void GetPos(int32_t* xpos, int32_t* ypos);
+    void GetPos(double* xpos, double* ypos);
    /**
     * @brief Gets the current position and angle of the robot
     *
@@ -179,7 +181,7 @@ public:
     * @param angle The variable to store the current angle of the robot in
     *              milliradians
     */
-    void GetPos(int32_t* xpos, int32_t* ypos, uint16_t* angle);
+    void GetPos(double* xpos, double* ypos, double* angle);
 
 
 
@@ -200,8 +202,8 @@ public:
     // 2 pi * radius = circumference
     // there are 3 rotations of the wheel per 1000 ticks [rover5 manual]
     // Ends up being 37.699111843077518861551720599354034610366032792501269
-    //static const double ticksToMills = (TWO_PI * wheelRadius * 3.0)/1000.0;
-    static const double constexpr ticksToMills = 1;
+    static constexpr double ticksToMills = (TWO_PI * wheelRadius * 3.0)/1000.0;
+    //static const double constexpr ticksToMills = 1;
 
     /// i2c Address of the interface arduino
     uint8_t interfaceAddress;
@@ -213,7 +215,7 @@ public:
 
     /// Current speeds for each motor in encoder ticks/second
     /// Maximum realistic value is about 25000
-    int16_t speeds[4];
+    double speeds[4];
 
     /// Current powers for each motor from -255 to 255
     int16_t powers[4];
@@ -221,7 +223,7 @@ public:
     /// Current position of the robot, obtained from encoder data, in ticks
     ///  and milliradians for angle
     //struct { int32_t x; int32_t y; uint16_t16_t angle; } pos;
-    struct { float x; int32_t y; float angle; } pos;
+    struct { double x; double y; double angle; } pos;
 
     // Circular buffer class holding the last ten tick counts and times
     template <uint8_t bufsz> struct TickLogs {
@@ -239,8 +241,8 @@ public:
         }
     };
 
-    //static const uint8_t spdLogLen = 10;
-    static const uint8_t spdLogLen = 1;
+    static const uint8_t spdLogLen = 10;
+    //static const uint8_t spdLogLen = 1;
     TickLogs<spdLogLen> tickLogs;
 
     // Scales array down to be under maximum but the same relative to

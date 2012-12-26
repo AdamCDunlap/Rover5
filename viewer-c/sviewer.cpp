@@ -177,6 +177,7 @@ int main(int argc, char* argv[]) {
         if (usecurses) {
             runOffKB();
         }
+        virtualBot.UpdateEncoders();
     }
 
     return 0;

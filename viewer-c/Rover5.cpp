@@ -1,4 +1,5 @@
 #include "Rover5.h"
+#include "PrintBox.h"
 
 Rover5::Rover5(int inardfd)
     : ardfd(inardfd)
@@ -55,38 +56,38 @@ void Rover5::GetTicks(int32_t outticks[4]) {
     memcpy(outticks, Rover5::ticks, sizeof(Rover5::ticks));
 }
 
-void Rover5::GetTickSpeeds(int16_t outspeeds[4]) {
+void Rover5::GetTickSpeeds(double outspeeds[4]) {
     memcpy(outspeeds, Rover5::speeds, sizeof(Rover5::speeds));
 }
 
-void Rover5::GetSpeeds(int16_t outspeeds[4]) {
+void Rover5::GetSpeeds(double outspeeds[4]) {
     for (uint8_t i=0; i<4; i++) {
         outspeeds[i] = speeds[i] * ticksToMills;
     }
 }
 
-void Rover5::GetDists(int32_t dists[4]) {
+void Rover5::GetDists(double dists[4]) {
     for (uint8_t i=0; i<4; i++) {
         dists[i] = ticks[i] * ticksToMills;
     }
 }
 
-int32_t Rover5::GetDist() {
+double Rover5::GetDist() {
     return ((ticks[FL] + ticks[FR] + ticks[BL] + ticks[BR]) * ticksToMills)/4;
 }
 
-void Rover5::GetDist(int32_t* xdist, int32_t* ydist) {
+void Rover5::GetDist(double* xdist, double* ydist) {
     *xdist = ((+ticks[FL] -ticks[FR] -ticks[BL] +ticks[BR]) * ticksToMills)/4;
     *ydist = ((+ticks[FL] +ticks[FR] +ticks[BL] +ticks[BR]) * ticksToMills)/4;
     
 }
 
-void Rover5::GetPos(int32_t* xpos, int32_t* ypos) {
+void Rover5::GetPos(double* xpos, double* ypos) {
     *xpos = pos.x * ticksToMills;
     *ypos = pos.y * ticksToMills;
 }
 
-void Rover5::GetPos(int32_t* xpos, int32_t* ypos, uint16_t* angle) {
+void Rover5::GetPos(double* xpos, double* ypos, double* angle) {
     *xpos = pos.x * ticksToMills;
     *ypos = pos.y * ticksToMills;
     *angle = pos.angle * ticksToMills;
@@ -118,24 +119,24 @@ bool Rover5::UpdateEncoders() {
 //    ticks[FR] *= -1;
 //    ticks[FL] *= -1;
 //
-//    UpdateSpeeds(ticks);
-//
-//    UpdatePosition();
-//    return true;
+    UpdateSpeeds(ticks);
+
+    UpdatePosition();
     return true;
 }
 
 void Rover5::UpdateSpeeds(int32_t ticks[4]) {
-    //uint32_t curTime = micros();
-    time_t curTime = clock()/(CLOCKS_PER_SEC/1000000);
+    uint32_t curTime = micros();
 
     uint32_t timesDiff = curTime - tickLogs.times[tickLogs.nextEntry];
     //Serial.print(F("tm: ")); Serial.print(timesDiff); Serial.print(' ');
+    static PrintBox timebox(1, 30, "Time Diff:");
+    timebox.printf("%30d", timesDiff);
     for (uint8_t i=0; i<4; i++) {
         // Difference in ticks from oldest entry to entry about to be put in
         //  over difference in the times over the same
         int32_t ticksDiff =  ticks[i] - tickLogs.ticks[tickLogs.nextEntry][i];
-        speeds[i] = (int16_t)(1000000.0 * (float)ticksDiff / (float)timesDiff);
+        speeds[i] = 1000000.0 * (double)ticksDiff / (double)timesDiff;
         //Serial.print(F("ck")); Serial.print(i); Serial.print(F(": ")); Serial.print(ticksDiff); Serial.print(' ');
         //Serial.print(F("tm: ")); Serial.print(timesDiff); Serial.print('\t');
     }
@@ -145,8 +146,7 @@ void Rover5::UpdateSpeeds(int32_t ticks[4]) {
 
 void Rover5::UpdatePosition() {
     // Variables used for integrating/dervitizing
-    //uint32_t curTime = micros();
-    time_t curTime = time(NULL);
+    uint32_t curTime = micros();
     static uint32_t lastTime = curTime;
     uint16_t timeDiff = curTime - lastTime;
     lastTime = curTime;
@@ -178,14 +178,14 @@ void Rover5::UpdatePosition() {
     
     // the postfix r means it's robot relative
     // These are in ticks/second
-    int16_t xvelr = (+(int32_t)speeds[FL] -(int32_t)speeds[FR] -(int32_t)speeds[BL] +(int32_t)speeds[BR])/4;
-    int16_t yvelr = (+(int32_t)speeds[FL] +(int32_t)speeds[FR] +(int32_t)speeds[BL] +(int32_t)speeds[BR])/4;
+    double xvelr = (+speeds[FL] -speeds[FR] -speeds[BL] +speeds[BR])/4;
+    double yvelr = (+speeds[FL] +speeds[FR] +speeds[BL] +speeds[BR])/4;
 
     // Now rotate the vector
-    float sinA = sin(pos.angle/1000.0);
-    float cosA = cos(pos.angle/1000.0);
-    float xvel = /*(int16_t)*/(xvelr * cosA - yvelr * sinA);
-    float yvel = /*(int16_t)*/(xvelr * sinA + yvelr * cosA);
+    double sinA = sin(pos.angle/1000.0);
+    double cosA = cos(pos.angle/1000.0);
+    double xvel = /*(int16_t)*/(xvelr * cosA - yvelr * sinA);
+    double yvel = /*(int16_t)*/(xvelr * sinA + yvelr * cosA);
 
     // max val of xvel is 25000
     // ((2^32)-1)/25000 = 172,000, which would mean if timeDiff is more than
@@ -195,8 +195,8 @@ void Rover5::UpdatePosition() {
     // the user deserves to get wrong answers.
     //pos.x  += (((int32_t)xvel * (int32_t)(timeDiff/10))/100000);
     //pos.y  += (((int32_t)yvel * (int32_t)(timeDiff/10))/100000);
-    pos.x  += (((float)xvel * (float)(timeDiff/10))/100000);
-    pos.y  += (((float)yvel * (float)(timeDiff/10))/100000);
+    pos.x  += xvel * timeDiff/1000000;
+    pos.y  += yvel * timeDiff/1000000;
 
     //printf_P(PSTR("xvelr%5d yvelr%5d sinA %.3f xvel %.3f yvel %.3f pos.x % f pos.y % f pos.angle % f enc[FL] %ld enc[FR] %ld enc[BL] %ld enc[BR] %ld\r\n"),
     //                  xvelr,   yvelr,     sinA,     xvel,     yvel,    pos.x,    pos.y,    pos.angle,  ticks[FL],  ticks[FR],  ticks[BL],  ticks[BR]);
