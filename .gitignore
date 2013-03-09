@@ -1,4 +1,4 @@
 viewer
 .*.swp
-doc/
 *.o
+build-*/

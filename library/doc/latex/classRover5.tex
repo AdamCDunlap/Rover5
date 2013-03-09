@@ -1,0 +1,361 @@
+\hypertarget{classRover5}{\section{Rover5 Class Reference}
+\label{classRover5}\index{Rover5@{Rover5}}
+}
+
+
+A class to control our \hyperlink{classRover5}{Rover5} robot platform.  
+
+
+
+
+{\ttfamily \#include $<$Rover5.\-h$>$}
+
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \hyperlink{classRover5_a7ab37bde98ed7f9626e8489e754b0afe}{mtr\-Num\-\_\-t} \{ {\bfseries B\-R} = 0, 
+{\bfseries F\-R} = 1, 
+{\bfseries B\-L} = 2, 
+{\bfseries F\-L} = 3
+ \}
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classRover5_aa8e420b415903841a5b72aebf40510e5}{Rover5} (uint8\-\_\-t i2caddress=12)
+\item 
+void \hyperlink{classRover5_a40a0c9f2780d03ba80430d9f85c5a82d}{begin} ()
+\begin{DoxyCompactList}\small\item\em Sets up class. \end{DoxyCompactList}\item 
+void \hyperlink{classRover5_aa1c9cc5c0baf2e6ec1bc17f4b5532085}{Run} (int front\-Left, int front\-Right, int back\-Left, int back\-Right)
+\begin{DoxyCompactList}\small\item\em Run motors directly. \end{DoxyCompactList}\item 
+void \hyperlink{classRover5_a40ef70c4d62031f1cdba8e7b6f000e81}{Run} (int powers\mbox{[}4\mbox{]})
+\begin{DoxyCompactList}\small\item\em Run motors directly. \end{DoxyCompactList}\item 
+void \hyperlink{classRover5_a531c2e92edc8f2d45ba7f7b497b61cf9}{Run} (int x, int y, int z=0)
+\begin{DoxyCompactList}\small\item\em Run the robot in a direction. \end{DoxyCompactList}\item 
+void \hyperlink{classRover5_acdcc24c043ad622563c80a836f211903}{Run} (int power, \hyperlink{classRover5_a7ab37bde98ed7f9626e8489e754b0afe}{mtr\-Num\-\_\-t} num)
+\begin{DoxyCompactList}\small\item\em Run one motor. \end{DoxyCompactList}\item 
+void \hyperlink{classRover5_a46a5f2eaa4fa4686fb262e688a8b0131}{Get\-Powers} (int powers\mbox{[}4\mbox{]})
+\begin{DoxyCompactList}\small\item\em Gets the most recently specified powers for each motor. \end{DoxyCompactList}\item 
+void \hyperlink{classRover5_aebefb7947f7f6a76c705b23124771d95}{Get\-Ticks} (long ticks\mbox{[}4\mbox{]})
+\begin{DoxyCompactList}\small\item\em Gets the current encoder counts for each motor. \end{DoxyCompactList}\item 
+void \hyperlink{classRover5_a7342a606f85727c43824fa0a6da67bb2}{Get\-Speeds} (int speeds\mbox{[}4\mbox{]})
+\begin{DoxyCompactList}\small\item\em Gets the current speeds for each motor. \end{DoxyCompactList}\item 
+void \hyperlink{classRover5_abd4ade4ebc8db92e53e56df7e8f6f828}{Get\-Tick\-Speeds} (int speeds\mbox{[}4\mbox{]})
+\begin{DoxyCompactList}\small\item\em Gets the current speeds for each motor. \end{DoxyCompactList}\item 
+bool \hyperlink{classRover5_a052241d5d85cef3430352f58aae6d3f0}{Update\-Encoders} ()
+\begin{DoxyCompactList}\small\item\em Get new encoder values and update current position and speed. \end{DoxyCompactList}\item 
+void \hyperlink{classRover5_aa5434eb305b6f5b04b11dc45a23e43fa}{Get\-Dists} (long dists\mbox{[}4\mbox{]})
+\begin{DoxyCompactList}\small\item\em Gets the current distances for each motor. \end{DoxyCompactList}\item 
+long \hyperlink{classRover5_a6f8505655d182d3fdc97a3829523d2a6}{Get\-Dist} ()
+\begin{DoxyCompactList}\small\item\em Gets the current distance the robot has gone. \end{DoxyCompactList}\item 
+void \hyperlink{classRover5_abdbaf08ebd97ce8266ffaf406324b830}{Get\-Dist} (long $\ast$xdist, long $\ast$ydist)
+\begin{DoxyCompactList}\small\item\em Gets the current distance the robot has gone. \end{DoxyCompactList}\item 
+void \hyperlink{classRover5_a0b5119724453ab464c539402b6828d1e}{Get\-Pos} (long $\ast$xpos, long $\ast$ypos)
+\begin{DoxyCompactList}\small\item\em Gets the current (x,y) position of the robot. \end{DoxyCompactList}\item 
+void \hyperlink{classRover5_a9f70c19d5b644c29da9abb04cc2ccfea}{Get\-Pos} (long $\ast$xpos, long $\ast$ypos, unsigned int $\ast$angle)
+\begin{DoxyCompactList}\small\item\em Gets the current position and angle of the robot. \end{DoxyCompactList}\item 
+\hypertarget{classRover5_aeb11dcea3c16c74c96f447f8c1a0fb82}{void \hyperlink{classRover5_aeb11dcea3c16c74c96f447f8c1a0fb82}{Set\-I2\-C\-Address} (uint8\-\_\-t address)}\label{classRover5_aeb11dcea3c16c74c96f447f8c1a0fb82}
+
+\begin{DoxyCompactList}\small\item\em Sets the i2c address of the interface arduino. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+A class to control our \hyperlink{classRover5}{Rover5} robot platform. 
+
+This class could theoretically control any four wheeled robot with mecanum wheels and encoders on each one with an interface arduino that communicates with a protocol defined in the protocol file 
+
+\subsection{Member Enumeration Documentation}
+\hypertarget{classRover5_a7ab37bde98ed7f9626e8489e754b0afe}{\index{Rover5@{Rover5}!mtr\-Num\-\_\-t@{mtr\-Num\-\_\-t}}
+\index{mtr\-Num\-\_\-t@{mtr\-Num\-\_\-t}!Rover5@{Rover5}}
+\subsubsection[{mtr\-Num\-\_\-t}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf Rover5\-::mtr\-Num\-\_\-t}}}\label{classRover5_a7ab37bde98ed7f9626e8489e754b0afe}
+Constants used to specify which motor to use or to index any array of motors in this class 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classRover5_aa8e420b415903841a5b72aebf40510e5}{\index{Rover5@{Rover5}!Rover5@{Rover5}}
+\index{Rover5@{Rover5}!Rover5@{Rover5}}
+\subsubsection[{Rover5}]{\setlength{\rightskip}{0pt plus 5cm}Rover5\-::\-Rover5 (
+\begin{DoxyParamCaption}
+\item[{uint8\-\_\-t}]{i2caddress = {\ttfamily 12}}
+\end{DoxyParamCaption}
+)}}\label{classRover5_aa8e420b415903841a5b72aebf40510e5}
+
+\begin{DoxyParams}{Parameters}
+{\em i2caddress} & The i2c address of the interface arduino. \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classRover5_a40a0c9f2780d03ba80430d9f85c5a82d}{\index{Rover5@{Rover5}!begin@{begin}}
+\index{begin@{begin}!Rover5@{Rover5}}
+\subsubsection[{begin}]{\setlength{\rightskip}{0pt plus 5cm}void Rover5\-::begin (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classRover5_a40a0c9f2780d03ba80430d9f85c5a82d}
+
+
+Sets up class. 
+
+This should be called after init() (ie. in setup()). \hypertarget{classRover5_a6f8505655d182d3fdc97a3829523d2a6}{\index{Rover5@{Rover5}!Get\-Dist@{Get\-Dist}}
+\index{Get\-Dist@{Get\-Dist}!Rover5@{Rover5}}
+\subsubsection[{Get\-Dist}]{\setlength{\rightskip}{0pt plus 5cm}long Rover5\-::\-Get\-Dist (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classRover5_a6f8505655d182d3fdc97a3829523d2a6}
+
+
+Gets the current distance the robot has gone. 
+
+This function just uses the current encoder counts.
+
+The \hyperlink{classRover5_a052241d5d85cef3430352f58aae6d3f0}{Update\-Encoders()} method should be called before calling this method.
+
+\begin{DoxyReturn}{Returns}
+The forward distance the robot has gone in mills 
+\end{DoxyReturn}
+\hypertarget{classRover5_abdbaf08ebd97ce8266ffaf406324b830}{\index{Rover5@{Rover5}!Get\-Dist@{Get\-Dist}}
+\index{Get\-Dist@{Get\-Dist}!Rover5@{Rover5}}
+\subsubsection[{Get\-Dist}]{\setlength{\rightskip}{0pt plus 5cm}void Rover5\-::\-Get\-Dist (
+\begin{DoxyParamCaption}
+\item[{long $\ast$}]{xdist, }
+\item[{long $\ast$}]{ydist}
+\end{DoxyParamCaption}
+)}}\label{classRover5_abdbaf08ebd97ce8266ffaf406324b830}
+
+
+Gets the current distance the robot has gone. 
+
+This function just uses the current encoder counts.
+
+The \hyperlink{classRover5_a052241d5d85cef3430352f58aae6d3f0}{Update\-Encoders()} method should be called before calling this method. 
+\begin{DoxyParams}{Parameters}
+{\em xdist} & The variable to store the lateral distance the robot has gone in mills. \\
+\hline
+{\em ydist} & The variable to store the forward distance the robot has gone in mills. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classRover5_aa5434eb305b6f5b04b11dc45a23e43fa}{\index{Rover5@{Rover5}!Get\-Dists@{Get\-Dists}}
+\index{Get\-Dists@{Get\-Dists}!Rover5@{Rover5}}
+\subsubsection[{Get\-Dists}]{\setlength{\rightskip}{0pt plus 5cm}void Rover5\-::\-Get\-Dists (
+\begin{DoxyParamCaption}
+\item[{long}]{dists\mbox{[}4\mbox{]}}
+\end{DoxyParamCaption}
+)}}\label{classRover5_aa5434eb305b6f5b04b11dc45a23e43fa}
+
+
+Gets the current distances for each motor. 
+
+This function populates the dists array with the current scaled encoder counts for each motor, in milliinches (mills). The \hyperlink{classRover5_a052241d5d85cef3430352f58aae6d3f0}{Update\-Encoders()} method should be called before calling this method. 
+\begin{DoxyParams}{Parameters}
+{\em dists} & The array to put the distances into. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classRover5_a0b5119724453ab464c539402b6828d1e}{\index{Rover5@{Rover5}!Get\-Pos@{Get\-Pos}}
+\index{Get\-Pos@{Get\-Pos}!Rover5@{Rover5}}
+\subsubsection[{Get\-Pos}]{\setlength{\rightskip}{0pt plus 5cm}void Rover5\-::\-Get\-Pos (
+\begin{DoxyParamCaption}
+\item[{long $\ast$}]{xpos, }
+\item[{long $\ast$}]{ypos}
+\end{DoxyParamCaption}
+)}}\label{classRover5_a0b5119724453ab464c539402b6828d1e}
+
+
+Gets the current (x,y) position of the robot. 
+
+The \hyperlink{classRover5_a052241d5d85cef3430352f58aae6d3f0}{Update\-Encoders()} method should be called before calling this method. 
+\begin{DoxyParams}{Parameters}
+{\em xpos} & The variable to store the x position of the robot in mills. \\
+\hline
+{\em xpos} & The variable to store the x position of the robot in mills. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classRover5_a9f70c19d5b644c29da9abb04cc2ccfea}{\index{Rover5@{Rover5}!Get\-Pos@{Get\-Pos}}
+\index{Get\-Pos@{Get\-Pos}!Rover5@{Rover5}}
+\subsubsection[{Get\-Pos}]{\setlength{\rightskip}{0pt plus 5cm}void Rover5\-::\-Get\-Pos (
+\begin{DoxyParamCaption}
+\item[{long $\ast$}]{xpos, }
+\item[{long $\ast$}]{ypos, }
+\item[{unsigned int $\ast$}]{angle}
+\end{DoxyParamCaption}
+)}}\label{classRover5_a9f70c19d5b644c29da9abb04cc2ccfea}
+
+
+Gets the current position and angle of the robot. 
+
+The \hyperlink{classRover5_a052241d5d85cef3430352f58aae6d3f0}{Update\-Encoders()} method should be called before calling this method. 
+\begin{DoxyParams}{Parameters}
+{\em xpos} & The variable to store the x position of the robot in mills. \\
+\hline
+{\em xpos} & The variable to store the x position of the robot in mills. \\
+\hline
+{\em angle} & The variable to store the current angle of the robot in milliradians \\
+\hline
+\end{DoxyParams}
+\hypertarget{classRover5_a46a5f2eaa4fa4686fb262e688a8b0131}{\index{Rover5@{Rover5}!Get\-Powers@{Get\-Powers}}
+\index{Get\-Powers@{Get\-Powers}!Rover5@{Rover5}}
+\subsubsection[{Get\-Powers}]{\setlength{\rightskip}{0pt plus 5cm}void Rover5\-::\-Get\-Powers (
+\begin{DoxyParamCaption}
+\item[{int}]{powers\mbox{[}4\mbox{]}}
+\end{DoxyParamCaption}
+)}}\label{classRover5_a46a5f2eaa4fa4686fb262e688a8b0131}
+
+
+Gets the most recently specified powers for each motor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em powers} & The array to put the powers into. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classRover5_a7342a606f85727c43824fa0a6da67bb2}{\index{Rover5@{Rover5}!Get\-Speeds@{Get\-Speeds}}
+\index{Get\-Speeds@{Get\-Speeds}!Rover5@{Rover5}}
+\subsubsection[{Get\-Speeds}]{\setlength{\rightskip}{0pt plus 5cm}void Rover5\-::\-Get\-Speeds (
+\begin{DoxyParamCaption}
+\item[{int}]{speeds\mbox{[}4\mbox{]}}
+\end{DoxyParamCaption}
+)}}\label{classRover5_a7342a606f85727c43824fa0a6da67bb2}
+
+
+Gets the current speeds for each motor. 
+
+This function populates the speeds array with the current speeds in milliinches (mills) per second for each motor. The \hyperlink{classRover5_a052241d5d85cef3430352f58aae6d3f0}{Update\-Encoders()} method should be called before calling this method. 
+\begin{DoxyParams}{Parameters}
+{\em speeds} & The array to put the speeds into. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classRover5_aebefb7947f7f6a76c705b23124771d95}{\index{Rover5@{Rover5}!Get\-Ticks@{Get\-Ticks}}
+\index{Get\-Ticks@{Get\-Ticks}!Rover5@{Rover5}}
+\subsubsection[{Get\-Ticks}]{\setlength{\rightskip}{0pt plus 5cm}void Rover5\-::\-Get\-Ticks (
+\begin{DoxyParamCaption}
+\item[{long}]{ticks\mbox{[}4\mbox{]}}
+\end{DoxyParamCaption}
+)}}\label{classRover5_aebefb7947f7f6a76c705b23124771d95}
+
+
+Gets the current encoder counts for each motor. 
+
+This function populates the ticks array with the current encoder counts for each motor. The \hyperlink{classRover5_a052241d5d85cef3430352f58aae6d3f0}{Update\-Encoders()} method should be called before calling this method. 
+\begin{DoxyParams}{Parameters}
+{\em ticks} & The array to put the ticks into. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classRover5_abd4ade4ebc8db92e53e56df7e8f6f828}{\index{Rover5@{Rover5}!Get\-Tick\-Speeds@{Get\-Tick\-Speeds}}
+\index{Get\-Tick\-Speeds@{Get\-Tick\-Speeds}!Rover5@{Rover5}}
+\subsubsection[{Get\-Tick\-Speeds}]{\setlength{\rightskip}{0pt plus 5cm}void Rover5\-::\-Get\-Tick\-Speeds (
+\begin{DoxyParamCaption}
+\item[{int}]{speeds\mbox{[}4\mbox{]}}
+\end{DoxyParamCaption}
+)}}\label{classRover5_abd4ade4ebc8db92e53e56df7e8f6f828}
+
+
+Gets the current speeds for each motor. 
+
+This function populates the speeds array with the current speeds in encoder ticks per second for each motor The \hyperlink{classRover5_a052241d5d85cef3430352f58aae6d3f0}{Update\-Encoders()} method should be called before calling this method. 
+\begin{DoxyParams}{Parameters}
+{\em speeds} & The array to put the speeds into. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classRover5_aa1c9cc5c0baf2e6ec1bc17f4b5532085}{\index{Rover5@{Rover5}!Run@{Run}}
+\index{Run@{Run}!Rover5@{Rover5}}
+\subsubsection[{Run}]{\setlength{\rightskip}{0pt plus 5cm}void Rover5\-::\-Run (
+\begin{DoxyParamCaption}
+\item[{int}]{front\-Left, }
+\item[{int}]{front\-Right, }
+\item[{int}]{back\-Left, }
+\item[{int}]{back\-Right}
+\end{DoxyParamCaption}
+)}}\label{classRover5_aa1c9cc5c0baf2e6ec1bc17f4b5532085}
+
+
+Run motors directly. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em front\-Left} & The power, from -\/255 to 255, of the front left motor. \\
+\hline
+{\em front\-Right} & The power, from -\/255 to 255, of the front right motor. \\
+\hline
+{\em back\-Left} & The power, from -\/255 to 255, of the back left motor. \\
+\hline
+{\em back\-Right} & The power, from -\/255 to 255, of the back right motor. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classRover5_a40ef70c4d62031f1cdba8e7b6f000e81}{\index{Rover5@{Rover5}!Run@{Run}}
+\index{Run@{Run}!Rover5@{Rover5}}
+\subsubsection[{Run}]{\setlength{\rightskip}{0pt plus 5cm}void Rover5\-::\-Run (
+\begin{DoxyParamCaption}
+\item[{int}]{powers\mbox{[}4\mbox{]}}
+\end{DoxyParamCaption}
+)}}\label{classRover5_a40ef70c4d62031f1cdba8e7b6f000e81}
+
+
+Run motors directly. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em powers} & An array of powers, from -\/255 to 255 for each motor.. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classRover5_a531c2e92edc8f2d45ba7f7b497b61cf9}{\index{Rover5@{Rover5}!Run@{Run}}
+\index{Run@{Run}!Rover5@{Rover5}}
+\subsubsection[{Run}]{\setlength{\rightskip}{0pt plus 5cm}void Rover5\-::\-Run (
+\begin{DoxyParamCaption}
+\item[{int}]{x, }
+\item[{int}]{y, }
+\item[{int}]{z = {\ttfamily 0}}
+\end{DoxyParamCaption}
+)}}\label{classRover5_a531c2e92edc8f2d45ba7f7b497b61cf9}
+
+
+Run the robot in a direction. 
+
+This should be the main movement function used by a programmer. Note that there is scaling in this function (and this function only) so that even a power of 1 will move the robot, so there is no deadband 
+\begin{DoxyParams}{Parameters}
+{\em x} & The power, from -\/255 to 255, of the lateral direction. \\
+\hline
+{\em y} & The power, from -\/255 to 255, of the forward direction. \\
+\hline
+{\em z} & The power, from -\/255 to 255, of rotation. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classRover5_acdcc24c043ad622563c80a836f211903}{\index{Rover5@{Rover5}!Run@{Run}}
+\index{Run@{Run}!Rover5@{Rover5}}
+\subsubsection[{Run}]{\setlength{\rightskip}{0pt plus 5cm}void Rover5\-::\-Run (
+\begin{DoxyParamCaption}
+\item[{int}]{power, }
+\item[{{\bf mtr\-Num\-\_\-t}}]{num}
+\end{DoxyParamCaption}
+)}}\label{classRover5_acdcc24c043ad622563c80a836f211903}
+
+
+Run one motor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em power} & The power to move the motor. \\
+\hline
+{\em num} & The motor to run. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classRover5_a052241d5d85cef3430352f58aae6d3f0}{\index{Rover5@{Rover5}!Update\-Encoders@{Update\-Encoders}}
+\index{Update\-Encoders@{Update\-Encoders}!Rover5@{Rover5}}
+\subsubsection[{Update\-Encoders}]{\setlength{\rightskip}{0pt plus 5cm}bool Rover5\-::\-Update\-Encoders (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classRover5_a052241d5d85cef3430352f58aae6d3f0}
+
+
+Get new encoder values and update current position and speed. 
+
+Call this function before calling any methods that use the encoders. \begin{DoxyReturn}{Returns}
+whether or not encoders were updated (ie no problems). 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+Rover5.\-h\item 
+Rover5.\-cpp\end{DoxyCompactItemize}
