@@ -11,20 +11,14 @@
 using namespace std;
 
 #include "Rover5.h"
-
+#include "Utility.h"
 #include "PrintBox.h"
-bool usecurses = isatty(1); // 1 is stdout
-
-// stty the port
-// read from the port
-// parse data
-// display data
-// ?do math
 
 bool checkForValue(int fd, char w);
 int openPort(const char* ardpath);
 void runOffKB();
 
+bool usecurses = isatty(1); // 1 is stdout
 Rover5 virtualBot;
 
 int main(int argc, char* argv[]) {
@@ -99,57 +93,50 @@ int main(int argc, char* argv[]) {
         if (checkForValue(ardfd, 'J')) goto startreading;
         // }}}
 
+        memcpy(virtualBot.ticks, encdsts, sizeof(encdsts));
+        virtualBot.UpdateEncoders();
 
+// {{{ Print data
         if (usecurses) {
-            static PrintBox stmicrosBox("Start Micros:");
-            stmicrosBox.printf("%10u", stmicros);
+            static PrintBox stmicrosBox("rStart Micros:");
+            stmicrosBox.mvprintw(0,0,"%10u", stmicros);
 
-            static PrintBox endmicrosBox("End Micros:");
-            endmicrosBox.printf("%10u", endmicros);
+            static PrintBox endmicrosBox("rEnd Micros:");
+            endmicrosBox.mvprintw(0,0,"%10u", endmicros);
 
-            static PrintBox encdstsBox(2, 16, "Enc Dists:");
-            encdstsBox.mvprintw(0,  0, "FL");
-            encdstsBox.mvprintw(0,  2, "% 5d", encdsts[Rover5::FL]);
-            encdstsBox.mvprintw(0, 14, "FR");
-            encdstsBox.mvprintw(0,  8, "% 5d", encdsts[Rover5::FR]);
-            encdstsBox.mvprintw(1,  0, "BL");
-            encdstsBox.mvprintw(1,  2, "% 5d", encdsts[Rover5::BL]);
-            encdstsBox.mvprintw(1, 14, "BR");
-            encdstsBox.mvprintw(1,  8, "% 5d", encdsts[Rover5::BR]);
+            static PrintBox encdstsBox(2, 16, "rEnc Dists:");
+            encdstsBox.mvprintw(0,0,"FL % 5d% 5d FR", encdsts[Rover5::FL], encdsts[Rover5::FR]);
+            encdstsBox.mvprintw(1,0,"BL % 5d% 5d BR", encdsts[Rover5::BL], encdsts[Rover5::BR]);
 
-            static PrintBox powsBox(2, 15, "Motor Powers:");
-            powsBox.mvprintw(0,  0, "FL");
-            powsBox.mvprintw(0,  2, "% 4d", pows[Rover5::FL]);
-            powsBox.mvprintw(0, 13, "FR");
-            powsBox.mvprintw(0,  8, "% 4d", pows[Rover5::FR]);
-            powsBox.mvprintw(1,  0, "BL");
-            powsBox.mvprintw(1,  2, "% 4d", pows[Rover5::BL]);
-            powsBox.mvprintw(1, 13, "BR");
-            powsBox.mvprintw(1,  8, "% 4d", pows[Rover5::BR]);
+            static PrintBox powsBox(2, 15, "rMotor Powers:");
+            powsBox.mvprintw(0,0,"FL % 4d% 4d FR", pows[Rover5::FL], pows[Rover5::FR]);
+            powsBox.mvprintw(1,0,"BL % 4d% 4d BR", pows[Rover5::BL], pows[Rover5::BR]);
 
-            static PrintBox posBox(3, 13, "Reported Pos:");
-            posBox.mvprintw(0,  2,   "x:");
-            posBox.mvprintw(0,  4, "% 5d", xpos);
-            posBox.mvprintw(1,  2,   "y:");
-            posBox.mvprintw(1,  4, "% 5d", ypos);
-            posBox.mvprintw(2,  0, "ang:");
-            posBox.mvprintw(2,  4, "% 5u", ang);
+            static PrintBox posBox(3, 13, "rPos:");
+            posBox.mvprintw(0,2,  "x: % 8d", xpos);
+            posBox.mvprintw(1,2,  "x: % 8d", ypos);
+            posBox.mvprintw(2,0,"ang: % 8u", ang);
 
-            static PrintBox distBox(2, "Reported Dist:");
-            distBox.mvprintw(0, 0, "x:");
-            distBox.mvprintw(1, 0, "y:");
-            distBox.mvprintw(0, 2, "% 5d", xdist);
-            distBox.mvprintw(1, 2, "% 5d", ydist);
+            static PrintBox distBox(2, 9, "rDist:");
+            distBox.mvprintw(0,0,"x: % 5d", xdist);
+            distBox.mvprintw(1,0,"y: % 5d", ydist);
 
-            static PrintBox spdsBox(2, 15, "Motor Speeds:");
-            spdsBox.mvprintw(0,  0, "FL");
-            spdsBox.mvprintw(0,  2, "% 5d", spds[Rover5::FL]);
-            spdsBox.mvprintw(0, 13, "FR");
-            spdsBox.mvprintw(0,  8, "% 5d", spds[Rover5::FR]);
-            spdsBox.mvprintw(1,  0, "BL");
-            spdsBox.mvprintw(1,  2, "% 5d", spds[Rover5::BL]);
-            spdsBox.mvprintw(1, 13, "BR");
-            spdsBox.mvprintw(1,  8, "% 5d", spds[Rover5::BR]);
+            static PrintBox spdsBox(2, 21, "rMotor Speeds:");
+            spdsBox.mvprintw(0,0,"FL % 7d % 7d FR", spds[Rover5::FL], spds[Rover5::FR]);
+            spdsBox.mvprintw(1,0,"BL % 7d % 7d BR", spds[Rover5::BL], spds[Rover5::BR]);
+
+            double calcSpds[4];
+            virtualBot.GetSpeeds(calcSpds);
+            static PrintBox calcSpdsBox(2, 31, "Calc'd Speeds:");
+            calcSpdsBox.mvprintw(0,0,"FL % 7.4f % 7.4f FR", calcSpds[Rover5::FL], calcSpds[Rover5::FR]);
+            calcSpdsBox.mvprintw(1,0,"BL % 7.4f % 7.4f BR", calcSpds[Rover5::BL], calcSpds[Rover5::BR]);
+
+            double calcxpos, calcypos, calcang;
+            virtualBot.GetPos(&calcxpos, &calcypos, &calcang);
+            static PrintBox calcPosBox(3, 20, "Calc'd Pos:");
+            calcPosBox.mvprintw(0,2,  "x: % 8.7f", calcxpos);
+            calcPosBox.mvprintw(1,2,  "y: % 8.7f", calcypos);
+            calcPosBox.mvprintw(2,0,"ang: % 8.7f", calcang);
 
             PrintBox::refreshAll();
         }
@@ -158,44 +145,38 @@ int main(int argc, char* argv[]) {
             printf(
                 "%10u %4d %4d %4d %4d % 4d % 4d % 4d % 4d %4d %4d %5u %5d %5d %10u\n",
                 stmicros,
-                encdsts[Rover5::FL],
-                encdsts[Rover5::FR],
-                encdsts[Rover5::BL],
-                encdsts[Rover5::BR],
-                pows[Rover5::FL],
-                pows[Rover5::FR],
-                pows[Rover5::BL],
-                pows[Rover5::BR],
-                xpos,
-                ypos,
-                ang,
-                xdist,
-                ydist,
+                encdsts[Rover5::FL], encdsts[Rover5::FR],
+                encdsts[Rover5::BL], encdsts[Rover5::BR],
+                pows[Rover5::FL], pows[Rover5::FR],
+                pows[Rover5::BL], pows[Rover5::BR],
+                xpos, ypos, ang,
+                xdist, ydist,
                 endmicros
             );
         }
+// }}}
+
         if (usecurses) {
             runOffKB();
         }
-        virtualBot.UpdateEncoders();
     }
 
     return 0;
 }
 
 void runOffKB() {
-    static PrintBox chBox("Most recent character:");
+    //static PrintBox chBox("Most recent character:");
     int ch = getch();
     if (ch != ERR) { // If something was actually typed
-        chBox.printf("%4d", ch);
+        //chBox.mvprintw(0,0,"%4d", ch);
         static int xpwr = 0, ypwr = 0, zpwr = 0;
         switch (ch) {
-        case 'w': ypwr = +128; break;
-        case 'a': xpwr = -128; break;
-        case 's': ypwr = -128; break;
-        case 'd': xpwr = +128; break;
-        case 'e': zpwr = +128; break;
-        case 'q': zpwr = -128; break;
+        case 'w': ypwr = +255; break;
+        case 'a': xpwr = -255; break;
+        case 's': ypwr = -255; break;
+        case 'd': xpwr = +255; break;
+        case 'e': zpwr = +255; break;
+        case 'q': zpwr = -255; break;
         default:  ypwr = xpwr = zpwr = 0; break;
         }
         virtualBot.Run(xpwr, ypwr, zpwr);
@@ -237,7 +218,6 @@ int openPort(const char* ardpath) {
     char sttycmd[256] = "stty -F ";
     strcat(sttycmd, ardpath);
     strcat(sttycmd, " cs8 115200 ignbrk -brkint -icrnl -imaxbel -opost -onlcr -isig -icanon -iexten -echo -echoe -echok -echoctl -echoke noflsh -ixon -crtscts");
-    //cout << "Running system(" << sttycmd << ")" << endl;
     if (system(sttycmd)) {
         cerr << "system(" << sttycmd << ") failed" << endl;
         exit(2);

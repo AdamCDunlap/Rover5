@@ -130,8 +130,8 @@ void Rover5::UpdateSpeeds(int32_t ticks[4]) {
 
     uint32_t timesDiff = curTime - tickLogs.times[tickLogs.nextEntry];
     //Serial.print(F("tm: ")); Serial.print(timesDiff); Serial.print(' ');
-    static PrintBox timebox(1, 30, "Time Diff:");
-    timebox.printf("%30d", timesDiff);
+    static PrintBox timebox("Time Diff:");
+    timebox.printf("%7u", timesDiff);
     for (uint8_t i=0; i<4; i++) {
         // Difference in ticks from oldest entry to entry about to be put in
         //  over difference in the times over the same
@@ -142,6 +142,17 @@ void Rover5::UpdateSpeeds(int32_t ticks[4]) {
     }
     tickLogs.Put(ticks, curTime);
     //Serial.print('|');
+
+
+    // Print out the tick log
+    static PrintBox tickLogBox(spdLogLen+1, 60, "Tick Log:");
+    tickLogBox.mvprintw(0,0,"  time               FL          FR          BL          BR");
+    for (uint8_t i=0; i<spdLogLen; i++) {
+        tickLogBox.mvprintw(i+1,0,"%c%10u %11d %11d %11d %11d",
+            i==tickLogs.nextEntry?'*':' ', tickLogs.times[i],
+            tickLogs.ticks[i][FL], tickLogs.ticks[i][FR],
+            tickLogs.ticks[i][BL], tickLogs.ticks[i][BR]);
+    }
 }
 
 void Rover5::UpdatePosition() {
@@ -181,11 +192,18 @@ void Rover5::UpdatePosition() {
     double xvelr = (+speeds[FL] -speeds[FR] -speeds[BL] +speeds[BR])/4;
     double yvelr = (+speeds[FL] +speeds[FR] +speeds[BL] +speeds[BR])/4;
 
+    static PrintBox velrBox(2,"Relative Velocities");
+    velrBox.mvprintw(0,0,"x: %8.7f", xvelr);
+    velrBox.mvprintw(1,0,"y: %8.7f", yvelr);
+
     // Now rotate the vector
     double sinA = sin(pos.angle/1000.0);
     double cosA = cos(pos.angle/1000.0);
     double xvel = /*(int16_t)*/(xvelr * cosA - yvelr * sinA);
     double yvel = /*(int16_t)*/(xvelr * sinA + yvelr * cosA);
+    static PrintBox velBox(2,"Absolute Velocities");
+    velrBox.mvprintw(0,0,"x: %8.7f", xvel);
+    velrBox.mvprintw(1,0,"y: %8.7f", yvel);
 
     // max val of xvel is 25000
     // ((2^32)-1)/25000 = 172,000, which would mean if timeDiff is more than
