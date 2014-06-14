@@ -9,6 +9,7 @@ enum mtrNum { BR = 0, FR = 1, BL = 2, FL = 3 };
 
 void setup() {
     Serial.begin(115200);
+    Serial.println("Hello, world!");
     Wire.begin();
 
     Wire.requestFrom(interfaceAddress, (uint8_t)16);

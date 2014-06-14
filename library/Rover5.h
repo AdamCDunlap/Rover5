@@ -190,6 +190,9 @@ private:
     // 2 pi * radius = circumference
     // there are 3 rotations of the wheel per 1000 ticks [rover5 manual]
     // Ends up being 37.699111843077518861551720599354034610366032792501269
+#if __cplusplus >= 201103L
+    constexpr
+#endif
     static const double ticksToMills = (TWO_PI * wheelRadius * 3.0)/1000.0;
     //static const double ticksToMills = 1;
 

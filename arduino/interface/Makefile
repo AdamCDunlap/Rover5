@@ -1,3 +1,4 @@
 ARDUINO_LIBS = Wire Wire/utility
 CPPFLAGS =# -save-temps
-include ~/arduino/sysoptions.mk
+BOARD_TAG=atmega328
+include ~/docs/arduino/sysoptions.mk
